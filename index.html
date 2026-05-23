@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patika Teras Kafe | Dijital Menü</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* === DEĞİŞKENLER VE RENK PALETİ === */
+        :root {
+            --primary-color: #2b4227; /* Orman Yeşili */
+            --accent-color: #c5a059;  /* Altın/Hardal Tonu */
+            --bg-color: #faf8f5;      /* Krem/Kirli Beyaz */
+            --text-dark: #2c2c2c;
+            --text-light: #666666;
+            --card-bg: #ffffff;
+            --transition: all 0.3s ease;
+        }
+
+        /* === GENEL AYARLAR === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Görüntü (View) Yönetimi için Sınıflar */
+        .view {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === ANA SAYFA (KATEGORİLER) TASARIMI === */
+        .hero {
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            padding: 60px 20px 40px;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            box-shadow: 0 10px 30px rgba(43, 66, 39, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hero arka plan deseni */
+        .hero::before {
+            content: '\f4d8'; /* Yaprak ikonu */
+            font-family: 'FontAwesome';
+            position: absolute;
+            font-size: 200px;
+            color: rgba(255,255,255,0.03);
+            top: -20px;
+            right: -30px;
+            transform: rotate(-15deg);
+        }
+
+        .cafe-name {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .cafe-tagline {
+            font-weight: 300;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 1px;
+        }
+
+        .categories-container {
+            max-width: 800px;
+            margin: -20px auto 40px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .category-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px 15px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .category-card:hover, .category-card:active {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(197, 160, 89, 0.2);
+            border-color: var(--accent-color);
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            transition: var(--transition);
+        }
+
+        .category-card:hover .category-icon {
+            color: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .category-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        /* === DETAY SAYFASI (MENÜ LİSTESİ) TASARIMI === */
+        .detail-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Ortalamak için */
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            transition: var(--transition);
+            position: absolute; /* Sola sabitlemek için */
+            left: 15px;
+        }
+
+        .back-btn:hover {
+            color: var(--accent-color);
+        }
+
+        .detail-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .menu-list-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .menu-item {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border-left: 4px solid var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .menu-item:hover {
+            border-left-color: var(--accent-color);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 8px;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+
+        .item-dotted-line {
+            flex-grow: 1;
+            border-bottom: 2px dotted #e0e0e0;
+            margin: 0 15px 6px 15px;
+            opacity: 0.5;
+        }
+
+        .item-price {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            white-space: nowrap;
+        }
+
+        .item-desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 300;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 40px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .social-icons {
+            margin-top: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .social-icons a {
+            text-decoration: none;
+        }
+        
+        .social-icons i {
+            margin: 0 10px;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .social-icons i:hover {
+            color: var(--accent-color);
+            transform: scale(1.1);
+        }
+        
+        .footer-hashtag {
+            margin-top: 15px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <main id="home-view" class="view active">
+        <header class="hero">
+            <h1 class="cafe-name">PATİKA TERAS KAFE</h1>
+            <p class="cafe-tagline">Doğanın Kalbinde, Lezzetin Zirvesinde</p>
+        </header>
+
+        <div class="categories-container">
+            <div class="category-grid">
+                <div class="category-card" onclick="openCategory('kahveler')">
+                    <i class="fa-solid fa-mug-hot category-icon"></i>
+                    <span class="category-title">Kahveler</span>
+                </div>
+
+                <div class="category-card" onclick="openCategory('caylar')">
+                    <i class="fa-solid fa-leaf category-icon"></i>
+                    <span class="category-title">Çaylar</span>
+                </div>
+
+                <div class="category-card" onclick="openCategory('soguk')">
+                    <i class="fa-solid fa-glass-water-droplet category-icon"></i>
+                    <span class="category-title">Soğuk İçecekler</span>
+                </div>
+
+                <div class="category-card" onclick="openCategory('tatlilar')">
+                    <i class="fa-solid fa-cake-candles category-icon"></i>
+                    <span class="category-title">Tatlılar</span>
+                </div>
+
+                <div class="category-card" onclick="openCategory('atistirmaliklar')">
+                    <i class="fa-solid fa-burger category-icon"></i>
+                    <span class="category-title">Atıştırmalıklar</span>
+                </div>
+
+                <div class="category-card" onclick="openCategory('nargile')">
+                    <i class="fa-solid fa-wind category-icon"></i>
+                    <span class="category-title">Nargile</span>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Bizi Sosyal Medyada Takip Edin</p>
+            <div class="social-icons">
+                <a href="https://www.instagram.com/patikaterascafe/" target="_blank" title="Instagram'da Takip Et">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+                <i class="fa-brands fa-facebook"></i>
+            </div>
+            <p class="footer-hashtag">#patikaheryerde</p>
+        </footer>
+    </main>
+
+    <main id="detail-view" class="view">
+        <header class="detail-header">
+            <button class="back-btn" onclick="goHome()">
+                <i class="fa-solid fa-arrow-left"></i> <span>Geri Dön</span>
+            </button>
+            <h2 id="category-page-title" class="detail-title">Kategori Adı</h2>
+        </header>
+
+        <div class="menu-list-container" id="menu-items-container">
+            </div>
+    </main>
+
+    <script>
+        // --- MENÜ İÇERİKLERİ ---
+        const menuData = {
+            'kahveler': {
+                title: "Kahve Çeşitleri",
+                items: [
+                    { name: "Patika Özel Filtre", desc: "Özenle kavrulmuş, dengeli gövdeli imza kahvemiz.", price: "100 ₺" },
+                    { name: "Espresso", desc: "Tek yudumluk yoğun İtalyan kahvesi.", price: "1 ₺" },
+                    { name: "Americano", desc: "Sıcak su ile inceltilmiş espresso.", price: "1 ₺" },
+                    { name: "Caffe Latte", desc: "Espresso, buharla ısıtılmış bol süt ve süt köpüğü.", price: "1 ₺" },
+                    { name: "Cappuccino", desc: "Eşit oranda espresso, sıcak süt ve yoğun süt köpüğü.", price: "1 ₺" },
+                    { name: "Karamel Macchiato", desc: "Karamel şurubu, espresso, sıcak süt ve köpük.", price: "1 ₺" }
+                ]
+            },
+            'caylar': {
+                title: "Çaylar & Bitki Çayları",
+                items: [
+                    { name: "Demleme Türk Çayı", desc: "Taze demlenmiş Doğu Karadeniz çayı (İnce Belli).", price: "1 ₺" },
+                    { name: "Fincan Çay", desc: "Büyük fincanda demleme Türk çayı.", price: "1 ₺" },
+                    { name: "Teras Kış Çayı", desc: "Ihlamur, zencefil, tarçın, karanfil, elma ve limon.", price: "1 ₺" },
+                    { name: "Yeşil Çay", desc: "Antioksidan deposu, yasemin yapraklı.", price: "1 ₺" },
+                    { name: "Adaçayı", desc: "Taze limon dilimi ile servis edilir.", price: "1 ₺" }
+                ]
+            },
+            'soguk': {
+                title: "Serinleten İçecekler",
+                items: [
+                    { name: "Orman Meyveli Smoothie", desc: "Böğürtlen, frambuaz, çilek ve süzme yoğurt.", price: "1 ₺" },
+                    { name: "Iced Latte", desc: "Buz, soğuk süt ve espresso.", price: "1 ₺" },
+                    { name: "Ev Yapımı Limonata", desc: "Taze nane yaprakları ile.", price: "1 ₺" },
+                    { name: "Churchill", desc: "Soda, limon suyu ve tuz.", price: "1 ₺" },
+                    { name: "Taze Sıkma Portakal Suyu", desc: "%100 doğal, günlük sıkım.", price: "1 ₺" }
+                ]
+            },
+            'tatlilar': {
+                title: "Tatlılar",
+                items: [
+                    { name: "San Sebastian Cheesecake", desc: "Akışkan kıvamlı, yanında Belçika çikolata sosu ile.", price: "1 ₺" },
+                    { name: "Teras Tiramisu", desc: "Mascarpone peyniri ve özel espresso likörü ile.", price: "1 ₺" },
+                    { name: "Orman Meyveli Turta", desc: "Taze orman meyveleri ve kıtır hamur.", price: "1 ₺" },
+                    { name: "Sıcak Çikolatalı Sufle", desc: "Yanında bir top vanilyalı dondurma ile servis edilir.", price: "1 ₺" }
+                ]
+            },
+            'atistirmaliklar': {
+                title: "Atıştırmalıklar",
+                items: [
+                    { name: "Patika Tost", desc: "Ekşi mayalı ekmeğe; sucuk, kaşar ve özel salça sos.", price: "1 ₺" },
+                    { name: "Kulüp Sandviç", desc: "Izgara tavuk, dana jambon, kaşar, yumurta, yeşillik ve patates kızartması ile.", price: "1 ₺" },
+                    { name: "Çıtır Tavuk Sepeti", desc: "Özel baharatlı tavuk parçaları, patates kızartması ve soslar.", price: "1 ₺" },
+                    { name: "Baharatlı Patates Kızartması", desc: "Kajun baharatı ve yoğurtlu dip sos ile.", price: "1 ₺" }
+                ]
+            },
+            'nargile': {
+                title: "Nargile Çeşitleri",
+                items: [
+                    { name: "Çift Elma", desc: "Geleneksel anason ve elma aroması.", price: "1 ₺" },
+                    { name: "Nane Limon", desc: "Ferahlatıcı nane ve ekşi limon uyumu.", price: "1 ₺" },
+                    { name: "Orman Meyveleri", desc: "Böğürtlen, ahududu ve çilek karışımı tatlı içim.", price: "1 ₺" },
+                    { name: "Patika Spesiyal", desc: "Kavun, şeftali, nane ve özel şurup (Buzlu marpuç ile servis edilir).", price: "1 ₺" },
+                    { name: "Buzlu Yaban Mersini", desc: "Yoğun yaban mersini ve serinletici buz etkisi.", price: "1 ₺" }
+                ]
+            }
+        };
+
+        // DOM Elementlerini Seçme
+        const homeView = document.getElementById('home-view');
+        const detailView = document.getElementById('detail-view');
+        const categoryPageTitle = document.getElementById('category-page-title');
+        const menuItemsContainer = document.getElementById('menu-items-container');
+
+        // Kategoriye Tıklanınca Çalışacak Fonksiyon
+        function openCategory(categoryKey) {
+            const data = menuData[categoryKey];
+            
+            categoryPageTitle.textContent = data.title;
+
+            menuItemsContainer.innerHTML = '';
+
+            data.items.forEach(item => {
+                const itemHTML = `
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-dotted-line"></div>
+                            <div class="item-price">${item.price}</div>
+                        </div>
+                        <div class="item-desc">${item.desc}</div>
+                    </div>
+                `;
+                menuItemsContainer.innerHTML += itemHTML;
+            });
+
+            homeView.classList.remove('active');
+            
+            window.scrollTo(0,0);
+            
+            detailView.classList.add('active');
+        }
+
+        // Geri Dön Butonuna Tıklanınca Çalışacak Fonksiyon
+        function goHome() {
+            detailView.classList.remove('active');
+            
+            window.scrollTo(0,0);
+            
+            homeView.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>
