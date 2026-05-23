@@ -446,12 +446,25 @@
             homeView.classList.remove('active');
             window.scrollTo(0,0);
             detailView.classList.add('active');
+
+            history.pushState({ categoryOpen: true }, '', '#' + categoryKey);
         }
 
-        function goHome() {
+        window.addEventListener('popstate', function() {
             detailView.classList.remove('active');
             window.scrollTo(0,0);
             homeView.classList.add('active');
+        });
+
+        function goHome() {
+            if (history.state && history.state.categoryOpen) {
+                history.back();
+            } else {
+                detailView.classList.remove('active');
+                window.scrollTo(0,0);
+                homeView.classList.add('active');
+                history.replaceState(null, '', window.location.pathname);
+            }
         }
     </script>
 
